@@ -1,0 +1,13 @@
+# docx-normalizer-ai-v2 Dependencies
+# Python 3.11+
+
+# Core
+python-docx>=1.1.0
+lxml>=5.0.0
+PyYAML>=6.0
+
+# RAG / Vector Store
+chromadb>=0.4.0
+
+# CLI
+click>=8.1.0

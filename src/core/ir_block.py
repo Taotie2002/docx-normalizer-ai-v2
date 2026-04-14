@@ -1,0 +1,133 @@
+"""
+DocumentIRBlock - 核心数据结构
+SRS-2026-002 V11.2
+
+语义驱动的文档编译器中，模块间通信的唯一数据结构。
+禁止在模块间传递原生 python-docx Document 对象。
+"""
+
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+
+
+@dataclass
+class DocumentIRBlock:
+    """
+    每一个物理段落或独立对象，必须被转化为严格的 DocumentIRBlock 对象。
+    
+    Attributes:
+        block_id: 唯一区块 UUID，用于多 Agent 审查回溯
+        text: 纯文本（复杂对象填 "[COMPLEX_ANCHOR]"）
+        label: 语义标签，必须属于 DFGP 定义的枚举 (如: MAIN_TITLE)
+        confidence: 判定置信度 (0.0 ~ 1.0)
+        source_para_idx: 原始文档的绝对段落序号 (严格递增，用于零丢失审计)
+        classifier_source: 判定来源枚举: RULE | RAG | SPATIAL | FALLBACK
+        
+        # 逻辑层级与结构特征
+        heading_level: 大纲级别 (如: 1, 2, 3)
+        list_level: 列表嵌套层级
+        is_list_item: 是否为列表项
+        
+        # 复杂对象物理挂载点
+        is_complex_obj: 是否包含表格、图片、公式
+        is_unsupported_obj: 是否为当前版本不支持的浮动对象
+        complex_type: TABLE | INLINE_PICTURE | OMATH
+        xml_payload: 完整底层 XML 字符串 (深拷贝)
+        rid_dependency_map: 依赖的 rId 映射表
+        
+        # 分页与视觉约束
+        pagination: 分页控制字典
+        metadata: 扩展元数据
+    """
+    
+    # === 核心标识 ===
+    block_id: str
+    text: str
+    label: str
+    confidence: float
+    source_para_idx: int
+    classifier_source: str  # RULE | RAG | SPATIAL | FALLBACK
+    
+    # === 逻辑层级与结构特征 ===
+    heading_level: Optional[int] = None
+    list_level: Optional[int] = None
+    is_list_item: bool = False
+    
+    # === 复杂对象物理挂载点 ===
+    is_complex_obj: bool = False
+    is_unsupported_obj: bool = False
+    complex_type: Optional[str] = None  # TABLE | INLINE_PICTURE | OMATH
+    xml_payload: Optional[str] = None
+    rid_dependency_map: Dict[str, str] = field(default_factory=dict)
+    
+    # === 分页与视觉约束 ===
+    pagination: Dict[str, bool] = field(default_factory=lambda: {
+        "keep_with_next": False,
+        "page_break_before": False,
+        "widow_control": True
+    })
+    
+    # === 扩展元数据 ===
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
+    def __post_init__(self):
+        """数据校验"""
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError(f"confidence must be 0.0~1.0, got {self.confidence}")
+        if self.source_para_idx < 0:
+            raise ValueError(f"source_para_idx must be non-negative, got {self.source_para_idx}")
+        if self.classifier_source not in ('RULE', 'RAG', 'SPATIAL', 'FALLBACK'):
+            raise ValueError(f"classifier_source must be RULE|RAG|SPATIAL|FALLBACK, got {self.classifier_source}")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """序列化"""
+        return {
+            "block_id": self.block_id,
+            "text": self.text,
+            "label": self.label,
+            "confidence": self.confidence,
+            "source_para_idx": self.source_para_idx,
+            "classifier_source": self.classifier_source,
+            "heading_level": self.heading_level,
+            "list_level": self.list_level,
+            "is_list_item": self.is_list_item,
+            "is_complex_obj": self.is_complex_obj,
+            "is_unsupported_obj": self.is_unsupported_obj,
+            "complex_type": self.complex_type,
+            "rid_dependency_map": self.rid_dependency_map,
+            "pagination": self.pagination,
+            "metadata": self.metadata
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'DocumentIRBlock':
+        """反序列化"""
+        return cls(**data)
+
+
+# === Label 枚举定义 (DFGP 语义标签) ===
+class BlockLabel:
+    """DFGP 定义的语义标签枚举"""
+    MAIN_TITLE = "MAIN_TITLE"           # 主标题
+    TITLE_L1 = "TITLE_L1"               # 一级标题 (一、)
+    TITLE_L2 = "TITLE_L2"               # 二级标题 (（一）)
+    TITLE_L3 = "TITLE_L3"               # 三级标题
+    SALUTATION = "SALUTATION"          # 称谓行
+    TEXT_BODY = "TEXT_BODY"             # 正文
+    CONCLUSION = "CONCLUSION"            # 结语
+    SIGNATURE = "SIGNATURE"             # 落款
+    LIST_ITEM = "LIST_ITEM"             # 列表项
+    TABLE = "TABLE"                     # 表格
+    INLINE_PICTURE = "INLINE_PICTURE"   # 嵌入式图片
+    PAGE_BREAK = "PAGE_BREAK"           # 分页符
+    UNKNOWN = "UNKNOWN"                 # 未知/未分类
+    
+    @classmethod
+    def is_valid(cls, label: str) -> bool:
+        """验证标签是否合法"""
+        return label in (
+            cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
+            cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
+            cls.LIST_ITEM, cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK,
+            cls.UNKNOWN
+        )

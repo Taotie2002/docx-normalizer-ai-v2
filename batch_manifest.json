@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "description": "批量处理状态机控制文件",
+  "state_machine": {
+    "states": [
+      "PENDING",
+      "EXTRACTING",
+      "CLASSIFYING", 
+      "COMPILING",
+      "VALIDATING",
+      "AUDITING",
+      "COMPLETED",
+      "FAILED",
+      "MANUAL_REVIEW_REQUIRED"
+    ],
+    "initial_state": "PENDING",
+    "transitions": {
+      "PENDING": ["EXTRACTING"],
+      "EXTRACTING": ["CLASSIFYING", "FAILED"],
+      "CLASSIFYING": ["COMPILING", "FAILED"],
+      "COMPILING": ["VALIDATING", "FAILED"],
+      "VALIDATING": ["AUDITING", "FAILED"],
+      "AUDITING": ["COMPLETED", "COMPILING", "MANUAL_REVIEW_REQUIRED"],
+      "MANUAL_REVIEW_REQUIRED": ["COMPLETED", "FAILED"]
+    }
+  },
+  "retry_policy": {
+    "max_retries_per_block": 3,
+    "circuit_breaker_threshold": 3
+  },
+  "jobs": []
+}
