@@ -89,9 +89,10 @@ class RuleSpatialClassifier:
         # 主题词：主题词：xxx
         self.re_theme_keyword = re.compile(r'^主题词：.+')
         
-        # 日期行：XXXX年XX月XX日
+        # 日期行：支持中文数字（〇二十○六）或阿拉伯数字（2026）
+        # 格式：年(4位数字或2-4个中文)月日
         self.re_date_line = re.compile(
-            r'^[*\u4e00-\u9fa5]{2,4}年[\u4e00-\u9fa5]{1,2}月[\u4e00-\u9fa5]{1,3}日$'
+            r'^(?:\d{4}|[一二三四五六七八九〇]{2,4})年[\d一二三四五六七八九十]{1,2}月[\d一二三四五六七八九十]{1,3}日$'
         )
         
         # 结语关键词
