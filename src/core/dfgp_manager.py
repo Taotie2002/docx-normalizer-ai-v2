@@ -138,11 +138,17 @@ class DFGPManager:
             "alignment": "CENTER",
             "space_before_pt": 8
         },
-        "SIGNATURE": {
+        # 落款分两级：署名 + 成文日期
+        "SIGNATURE_NAME": {
+            "font_family": "仿宋_GB2312",
+            "font_size_pt": 16,
+            "alignment": "RIGHT"  # 署名居右对齐
+        },
+        "SIGNATURE_DATE": {
             "font_family": "仿宋_GB2312",
             "font_size_pt": 16,
             "alignment": "RIGHT",
-            "right_indent_chars": 2  # 落款右空两字
+            "right_indent_chars": 4  # 成文日期严格右空四字
         },
         "LIST_ITEM": {
             "font_family": "仿宋_GB2312",
@@ -191,7 +197,7 @@ class DFGPManager:
     
     def _validate_config(self) -> None:
         """验证配置完整性"""
-        required_labels = ['MAIN_TITLE', 'TITLE_L1', 'TITLE_L2', 'TEXT_BODY', 'SIGNATURE']
+        required_labels = ['MAIN_TITLE', 'TITLE_L1', 'TITLE_L2', 'TEXT_BODY', 'SIGNATURE_NAME', 'SIGNATURE_DATE']
         for label in required_labels:
             if label not in self.config:
                 logger.warning(f"缺少标签 {label}，将使用默认配置")

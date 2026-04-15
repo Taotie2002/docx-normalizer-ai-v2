@@ -220,12 +220,12 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 主题词: {text}")
             return
 
-        # 日期行
+        # 日期行 → 成文日期（严格右空四字）
         if self._is_date_line(text):
-            block.label = BlockLabel.SIGNATURE  # 日期行归属落款
+            block.label = BlockLabel.SIGNATURE_DATE  # 成文日期
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
-            logger.debug(f"[L1] 日期行: {text}")
+            logger.debug(f"[L1] 成文日期: {text}")
             return
         
         # 结语
@@ -256,13 +256,13 @@ class RuleSpatialClassifier:
                 block.confidence = self.config.spatial_confidence
             return
         
-        # 落款区（后15%）
+        # 落款区（后15%）→ 发文机关署名
         if position_ratio >= self.config.signature_zone_ratio:
             if self._is_signature(text):
-                block.label = BlockLabel.SIGNATURE
+                block.label = BlockLabel.SIGNATURE_NAME  # 发文机关署名
                 block.classifier_source = "SPATIAL"
                 block.confidence = self.config.spatial_confidence
-                logger.debug(f"[L3] 落款(位置): {text[:20]}")
+                logger.debug(f"[L3] 发文署名(位置): {text[:20]}")
                 return
         
         # ========== Fallback: 正文 ==========

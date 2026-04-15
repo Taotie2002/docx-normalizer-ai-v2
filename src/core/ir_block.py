@@ -132,7 +132,9 @@ class BlockLabel:
     SALUTATION = "SALUTATION"          # 称谓行
     TEXT_BODY = "TEXT_BODY"             # 正文
     CONCLUSION = "CONCLUSION"          # 结语
-    SIGNATURE = "SIGNATURE"             # 落款
+    # 落款分两级
+    SIGNATURE_NAME = "SIGNATURE_NAME"     # 发文机关署名（居右对齐）
+    SIGNATURE_DATE = "SIGNATURE_DATE"       # 成文日期（严格右空四字）
     ATTACHMENT = "ATTACHMENT"           # 附件说明
     LIST_ITEM = "LIST_ITEM"             # 列表项
     CC_UNIT = "CC_UNIT"                 # 抄送单位
@@ -152,7 +154,7 @@ class BlockLabel:
         """验证标签是否合法"""
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
-            cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
+            cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE_NAME, cls.SIGNATURE_DATE,
             cls.ATTACHMENT, cls.LIST_ITEM, cls.CC_UNIT, cls.PUBLISHER_INFO, cls.THEME_KEYWORD,
             cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK, cls.UNKNOWN
         )
@@ -162,7 +164,7 @@ class BlockLabel:
         """是否为纯段落类型（不含复杂对象）"""
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
-            cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
+            cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE_NAME, cls.SIGNATURE_DATE,
             cls.ATTACHMENT, cls.LIST_ITEM, cls.CC_UNIT, cls.PUBLISHER_INFO, cls.THEME_KEYWORD,
             cls.UNKNOWN
         )
