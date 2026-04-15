@@ -348,10 +348,16 @@ class RuleSpatialClassifier:
         """判断是否主题词"""
         return self.re_theme_keyword.match(text) is not None
     
+    # 第X条正则（用于排除）
+    re_article_exclude = re.compile(r'^第[一二三四五六七八九十]+条')
+    
     def _is_salutation(self, text: str) -> bool:
-        """判断是否称谓行（排除发文号等干扰项）"""
+        """判断是否称谓行（排除发文号、第X条等干扰项）"""
         # 排除含有〔年份〕的干扰项
         if '〔' in text and '〕' in text:
+            return False
+        # 排除"第X条"格式
+        if self.re_article_exclude.match(text):
             return False
         return (
             text.startswith('尊敬的')
