@@ -65,7 +65,7 @@ class RuleSpatialClassifier:
 
         # 二级标题:(一)、(二)、...
         self.re_heading_2 = re.compile(
-            r'^([一二三四五六七八九十]+)'
+            r'^（[一二三四五六七八九十]+）'
         )
 
         # 三级标题:1.1、1.1.1(纯数字点号)
@@ -82,7 +82,7 @@ class RuleSpatialClassifier:
         )
 
         # 签发人:签发人:xxx
-        self.re_issuer = re.compile(r'^签发人:.+')
+        self.re_issuer = re.compile(r'^签发人：.+')
 
         # 发文号:xxx〔2024〕xxx号
         self.re_document_number = re.compile(r'^.*〔\d{4}〕.*号$')
