@@ -19,6 +19,25 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class PageMargin:
+    """页面边距（Twips 单位）"""
+    top_twips: int
+    bottom_twips: int
+    left_twips: int
+    right_twips: int
+    
+    @classmethod
+    def from_cm(cls, top_cm: float, bottom_cm: float, left_cm: float, right_cm: float) -> 'PageMargin':
+        """从厘米值创建（1cm = 567 Twips）"""
+        return cls(
+            top_twips=int(top_cm * 567),
+            bottom_twips=int(bottom_cm * 567),
+            left_twips=int(left_cm * 567),
+            right_twips=int(right_cm * 567)
+        )
+
+
+@dataclass
 class StyleParams:
     """样式参数（Twips 单位）"""
     font_family: str
@@ -144,6 +163,14 @@ class DFGPManager:
         else:
             self.config = self.DEFAULT_CONFIG.copy()
             logger.info("使用 GB/T 9704-2012 默认配置")
+        
+        # GB/T 9704-2012 页面边距
+        self.page_margin = PageMargin.from_cm(
+            top_cm=3.7,
+            bottom_cm=3.5,
+            left_cm=2.8,
+            right_cm=2.6
+        )
         
         # 验证配置
         self._validate_config()
