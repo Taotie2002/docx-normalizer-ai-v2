@@ -133,6 +133,7 @@ class BlockLabel:
     TEXT_BODY = "TEXT_BODY"             # 正文
     CONCLUSION = "CONCLUSION"          # 结语
     SIGNATURE = "SIGNATURE"             # 落款
+    ATTACHMENT = "ATTACHMENT"           # 附件说明
     LIST_ITEM = "LIST_ITEM"             # 列表项
     
     # 复杂对象
@@ -149,7 +150,7 @@ class BlockLabel:
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
             cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
-            cls.LIST_ITEM, cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK,
+            cls.ATTACHMENT, cls.LIST_ITEM, cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK,
             cls.UNKNOWN
         )
     
@@ -159,5 +160,5 @@ class BlockLabel:
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
             cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
-            cls.LIST_ITEM, cls.UNKNOWN
+            cls.ATTACHMENT, cls.LIST_ITEM, cls.UNKNOWN
         )

@@ -51,25 +51,6 @@ class StyleParams:
         }
 
 
-@dataclass
-class PageMargin:
-    """页面边距（Twips 单位）"""
-    top_twips: int
-    bottom_twips: int
-    left_twips: int
-    right_twips: int
-    
-    @classmethod
-    def from_cm(cls, top_cm: float, bottom_cm: float, left_cm: float, right_cm: float) -> 'PageMargin':
-        """从厘米值创建（1cm = 567 Twips）"""
-        return cls(
-            top_twips=int(top_cm * 567),
-            bottom_twips=int(bottom_cm * 567),
-            left_twips=int(left_cm * 567),
-            right_twips=int(right_cm * 567)
-        )
-
-
 class DFGPManager:
     """
     文档格式基因图谱 (DFGP) 管理器
@@ -77,6 +58,7 @@ class DFGPManager:
     GB/T 9704-2012 公文格式标准预设配置：
     - 主标题：方正小标宋简体 22pt 居中
     - 一级标题：黑体 16pt
+    - 二级标题：楷体_GB2312 16pt
     - 二级标题：楷体_GB2312 16pt
     - 正文：仿宋_GB2312 16pt 首行缩进32pt
     - 落款：仿宋_GB2312 16pt 右空两字
@@ -121,7 +103,6 @@ class DFGPManager:
             "alignment": "JUSTIFY",
             "first_line_indent_chars": 2,  # 首行缩进两字
             "line_spacing_pt": 28,
-            "space_after_pt": 0,
             "keep_with_next": True
         },
         "CONCLUSION": {
@@ -134,7 +115,7 @@ class DFGPManager:
             "font_family": "仿宋_GB2312",
             "font_size_pt": 16,
             "alignment": "RIGHT",
-            "right_indent_chars": 2  # 落款右空两字（缩进语义，非对齐）
+            "right_indent_chars": 2  # 落款右空两字
         },
         "LIST_ITEM": {
             "font_family": "仿宋_GB2312",
@@ -150,14 +131,6 @@ class DFGPManager:
         }
     }
     
-    # GB/T 9704-2012 页面边距
-    DEFAULT_PAGE_MARGIN = PageMargin.from_cm(
-        top_cm=3.7,
-        bottom_cm=3.5,
-        left_cm=2.8,
-        right_cm=2.6
-    )
-    
     def __init__(self, yaml_path: Optional[str] = None):
         """
         初始化 DFGP 管理器
@@ -171,9 +144,6 @@ class DFGPManager:
         else:
             self.config = self.DEFAULT_CONFIG.copy()
             logger.info("使用 GB/T 9704-2012 默认配置")
-        
-        # 页边距
-        self.page_margin = self.DEFAULT_PAGE_MARGIN
         
         # 验证配置
         self._validate_config()
@@ -196,6 +166,13 @@ class DFGPManager:
         for label, params in self.config.items():
             if 'first_line_indent_chars' in params and 'first_line_indent_twips' in params:
                 logger.warning(f"标签 '{label}' 同时定义了字符和Twips缩进，可能存在冲突")
+        
+        # 验证必需字段
+        for label, params in self.config.items():
+            if 'font_family' not in params:
+                logger.error(f"标签 '{label}' 缺少必需字段 font_family")
+            if 'font_size_pt' not in params and 'font_size_twips' not in params:
+                logger.error(f"标签 '{label}' 缺少字体大小字段 (font_size_pt 或 font_size_twips)")
     
     def get_style_params(self, label: str) -> StyleParams:
         """
@@ -220,7 +197,7 @@ class DFGPManager:
         font_size_twips = self._pt_to_twips(font_size_pt)
         alignment = base.get('alignment', 'LEFT')
         
-        # 动态计算字符缩进（首行缩进）
+        # 动态计算字符缩进
         first_line_indent_twips = None
         if 'first_line_indent_chars' in base:
             chars = base['first_line_indent_chars']
@@ -229,7 +206,6 @@ class DFGPManager:
             first_line_indent_twips = base['first_line_indent_twips']
         
         # 动态计算右侧缩进（落款右空两字）
-        # 注意："右空两字"是缩进语义，不是对齐
         right_indent_twips = None
         if 'right_indent_chars' in base:
             chars = base['right_indent_chars']
@@ -262,10 +238,6 @@ class DFGPManager:
             outline_level=base.get('outline_level')
         )
     
-    def get_page_margin(self) -> PageMargin:
-        """获取页面边距"""
-        return self.page_margin
-    
     def _pt_to_twips(self, pt: float) -> int:
         """磅值转 Twips (1pt = 20 Twips)"""
         return int(pt * 20)
@@ -285,6 +257,9 @@ class DFGPManager:
         Returns:
             Twips 值
         """
+        # 防止负数输入
+        if chars < 0 or font_size_pt < 0:
+            raise ValueError(f"字符数和字号不能为负: chars={chars}, font_size_pt={font_size_pt}")
         return int(chars * font_size_pt * 20)
     
     def get_all_labels(self) -> List[str]:
