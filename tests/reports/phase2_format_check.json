@@ -1,0 +1,299 @@
+[
+  {
+    "filename": "a_001_a1.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 53,
+    "labels": {
+      "TEXT_BODY": 40,
+      "SALUTATION": 1,
+      "SIGNATURE_DATE": 1,
+      "TITLE_L2": 1,
+      "SIGNATURE_NAME": 10
+    },
+    "v03_pass": true,
+    "format_issues": []
+  },
+  {
+    "filename": "a_002_a2.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 453,
+    "labels": {
+      "MAIN_TITLE": 6,
+      "TEXT_BODY": 386,
+      "TITLE_L1": 9,
+      "TITLE_L2": 20,
+      "SIGNATURE_NAME": 32
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "a_003_a3.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 2002,
+    "labels": {
+      "MAIN_TITLE": 55,
+      "SALUTATION": 12,
+      "TEXT_BODY": 1808,
+      "TITLE_L1": 29,
+      "TITLE_L2": 4,
+      "SIGNATURE_NAME": 94
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "a_004_a4.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 798,
+    "labels": {
+      "MAIN_TITLE": 9,
+      "SALUTATION": 1,
+      "TITLE_L1": 132,
+      "TEXT_BODY": 546,
+      "TITLE_L2": 23,
+      "SIGNATURE_NAME": 87
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "a_005_a5.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 144,
+    "labels": {
+      "MAIN_TITLE": 1,
+      "SALUTATION": 7,
+      "TEXT_BODY": 73,
+      "TITLE_L1": 14,
+      "TITLE_L2": 44,
+      "SIGNATURE_NAME": 5
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "a_006_a6.docx",
+    "type": "A-PURE-TEXT",
+    "status": "PASS",
+    "blocks_count": 23,
+    "labels": {
+      "MAIN_TITLE": 1,
+      "SALUTATION": 1,
+      "TITLE_L1": 3,
+      "TITLE_L2": 5,
+      "TEXT_BODY": 11,
+      "SIGNATURE_NAME": 2
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "b_001_b1.docx",
+    "type": "B-NESTED-LISTS",
+    "status": "PASS",
+    "blocks_count": 1321,
+    "labels": {
+      "SALUTATION": 31,
+      "MAIN_TITLE": 39,
+      "TEXT_BODY": 1146,
+      "TITLE_L1": 48,
+      "TITLE_L2": 32,
+      "SIGNATURE_NAME": 25
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_001_c1.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 507,
+    "labels": {
+      "MAIN_TITLE": 14,
+      "TEXT_BODY": 492,
+      "SIGNATURE_NAME": 1
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_002_c2.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 207,
+    "labels": {
+      "MAIN_TITLE": 15,
+      "TEXT_BODY": 182,
+      "SIGNATURE_NAME": 10
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_003_c3.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 1784,
+    "labels": {
+      "MAIN_TITLE": 60,
+      "TEXT_BODY": 1652,
+      "SALUTATION": 6,
+      "TITLE_L2": 6,
+      "SIGNATURE_NAME": 60
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_004_c4.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 240,
+    "labels": {
+      "SALUTATION": 1,
+      "MAIN_TITLE": 6,
+      "TEXT_BODY": 232,
+      "SIGNATURE_NAME": 1
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_005_c5.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 957,
+    "labels": {
+      "SALUTATION": 14,
+      "MAIN_TITLE": 29,
+      "TEXT_BODY": 903,
+      "SIGNATURE_NAME": 11
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_006_c6.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 2701,
+    "labels": {
+      "MAIN_TITLE": 151,
+      "TEXT_BODY": 2463,
+      "SALUTATION": 7,
+      "SIGNATURE_NAME": 80
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_007_c7.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 141,
+    "labels": {
+      "MAIN_TITLE": 7,
+      "TEXT_BODY": 133,
+      "SIGNATURE_NAME": 1
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  },
+  {
+    "filename": "c_008_c8.docx",
+    "type": "C-TABLES-IMAGES",
+    "status": "PASS",
+    "blocks_count": 87,
+    "labels": {
+      "TEXT_BODY": 81,
+      "SIGNATURE_NAME": 6
+    },
+    "v03_pass": true,
+    "format_issues": []
+  },
+  {
+    "filename": "d_001_d1.docx",
+    "type": "D-MESSY-FORMAT",
+    "status": "PASS",
+    "blocks_count": 87,
+    "labels": {
+      "MAIN_TITLE": 6,
+      "TEXT_BODY": 78,
+      "SIGNATURE_NAME": 3
+    },
+    "v03_pass": true,
+    "format_issues": [
+      "[0] 缺少w:ind",
+      "[1] 缺少w:ind",
+      "[2] 缺少w:ind",
+      "[3] 缺少w:ind",
+      "[4] 缺少w:ind"
+    ]
+  }
+]

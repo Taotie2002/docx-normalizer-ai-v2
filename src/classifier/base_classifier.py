@@ -28,7 +28,7 @@ class ClassifierConfig:
     
     # 文本长度阈值
     short_text_threshold: int = 30    # 短文本阈值
-    very_short_threshold: int = 25    # 极短文本阈值
+    very_short_threshold: int = 50    # 极短文本阈值
     
     # 置信度
     rule_confidence: float = 1.0
@@ -70,6 +70,16 @@ class RuleSpatialClassifier:
         
         # 三级标题：1.1、1.1.1（纯数字点号）
         self.re_heading_3 = re.compile(r'^\d+\.\d+(?:\.\d+)?$')
+
+        # 一级标题：第X章　XXX（章节格式）
+        self.re_heading_1_chapter = re.compile(
+            r'^第[一二三四五六七八九十]+章[\u3000\s　]+'
+        )
+
+        # 二级标题：第X条（...）格式
+        self.re_heading_2_article = re.compile(
+            r'^第[一二三四五六七八九十]+条（.+）'
+        )
 
         # 签发人：签发人：xxx
         self.re_issuer = re.compile(r'^签发人：.+')
@@ -156,7 +166,23 @@ class RuleSpatialClassifier:
         position_ratio = block.source_para_idx / max(total_blocks - 1, 1)
         
         # ========== L1: 规则判断（最高优先级）==========
-        
+
+        # 称谓行
+        if self._is_salutation(text):
+            block.label = BlockLabel.SALUTATION
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 称谓行: {text[:20]}")
+            return
+
+        # 一级标题（第X章）
+        if self.re_heading_1_chapter.match(text):
+            block.label = BlockLabel.TITLE_L1
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 一级标题(章): {text[:20]}")
+            return
+
         # 一级标题：一、二、三、...
         if self._is_heading_1(text):
             block.label = BlockLabel.TITLE_L1
@@ -164,7 +190,15 @@ class RuleSpatialClassifier:
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 一级标题: {text[:20]}")
             return
-        
+
+        # 二级标题（第X条）
+        if self.re_heading_2_article.match(text):
+            block.label = BlockLabel.TITLE_L2
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 二级标题(条): {text[:20]}")
+            return
+
         # 二级标题：（一）、（二）、...
         if self._is_heading_2(text):
             block.label = BlockLabel.TITLE_L2
@@ -241,11 +275,7 @@ class RuleSpatialClassifier:
         
         # 标题区（前10%）
         if position_ratio <= self.config.title_zone_ratio:
-            if self._is_salutation(text):
-                block.label = BlockLabel.SALUTATION
-                block.classifier_source = "SPATIAL"
-                block.confidence = self.config.spatial_confidence
-            elif len(text) < self.config.very_short_threshold:
+            if len(text) < self.config.very_short_threshold:
                 block.label = BlockLabel.MAIN_TITLE
                 block.classifier_source = "SPATIAL"
                 block.confidence = self.config.spatial_confidence
@@ -319,9 +349,12 @@ class RuleSpatialClassifier:
         return self.re_theme_keyword.match(text) is not None
     
     def _is_salutation(self, text: str) -> bool:
-        """判断是否称谓行"""
+        """判断是否称谓行（排除发文号等干扰项）"""
+        # 排除含有〔年份〕的干扰项
+        if '〔' in text and '〕' in text:
+            return False
         return (
-            text.startswith('尊敬的') 
+            text.startswith('尊敬的')
             or ('：' in text and len(text) < 30)
             or text.endswith('：')
         )

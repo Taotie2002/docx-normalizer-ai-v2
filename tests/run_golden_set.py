@@ -19,7 +19,7 @@ from typing import List, Dict
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.extractor.ooxml_parser import DocxExtractor
-from src.compiler.builder import DocxCompiler
+from src.compiler.xml_injector import SemanticCompiler
 from src.auditor.validator import V03Validator, V03ValidationResult
 from src.core.exceptions import ExtractionError, CompilationError
 
@@ -88,7 +88,7 @@ class GoldenSetRunner:
             result["blocks_count"] = len(raw_blocks)
             
             # Step 2: Build
-            compiler = DocxCompiler()
+            compiler = SemanticCompiler()
             compiler.build_from_ir(raw_blocks, str(temp_rebuilt))
             
             # Step 3: Extract rebuilt for validation
