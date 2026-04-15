@@ -142,7 +142,8 @@ class DFGPManager:
         "SIGNATURE_NAME": {
             "font_family": "仿宋_GB2312",
             "font_size_pt": 16,
-            "alignment": "RIGHT"  # 署名居右对齐
+            "alignment": "RIGHT",
+            "right_indent_chars": 2  # 右空两字
         },
         "SIGNATURE_DATE": {
             "font_family": "仿宋_GB2312",

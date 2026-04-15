@@ -2,9 +2,9 @@
 Base Classifier - 基础分类器
 SRS-2026-002 V11.2 | Phase 2
 
-混合分类策略：
-- L1 Rule: 正则匹配（标题、日期等）
-- L3 Spatial: 位置推断（前10%标题区，后15%落款区）
+混合分类策略:
+- L1 Rule: 正则匹配(标题、日期等)
+- L3 Spatial: 位置推断(前10%标题区,后15%落款区)
 - Fallback: 兜底为正文
 """
 
@@ -25,11 +25,11 @@ class ClassifierConfig:
     # 空间位置阈值
     title_zone_ratio: float = 0.10   # 前10%为标题区
     signature_zone_ratio: float = 0.85  # 后15%为落款区
-    
+
     # 文本长度阈值
     short_text_threshold: int = 30    # 短文本阈值
     very_short_threshold: int = 50    # 极短文本阈值
-    
+
     # 置信度
     rule_confidence: float = 1.0
     spatial_confidence: float = 0.8
@@ -39,133 +39,133 @@ class ClassifierConfig:
 class RuleSpatialClassifier:
     """
     L1(Rule) + L3(Spatial) 混合分类器
-    
-    特点：
-    - 无需 LLM，纯规则判断
-    - 优先级：Rule > Spatial > Fallback
-    - 输出：原地更新 DocumentIRBlock 的 label 字段
+
+    特点:
+    - 无需 LLM,纯规则判断
+    - 优先级:Rule > Spatial > Fallback
+    - 输出:原地更新 DocumentIRBlock 的 label 字段
     """
-    
+
     def __init__(self, config: Optional[ClassifierConfig] = None):
         """
         初始化分类器
-        
+
         Args:
-            config: 可选配置，默认使用 GB/T 9704 标准
+            config: 可选配置,默认使用 GB/T 9704 标准
         """
         self.config = config or ClassifierConfig()
         self._compile_patterns()
-    
+
     def _compile_patterns(self) -> None:
         """编译常用正则表达式"""
-        # 一级标题：一、二、三、...
+        # 一级标题:一、二、三、...
         self.re_heading_1 = re.compile(
             r'^[一二三四五六七八九十]+、'
         )
-        
-        # 二级标题：（一）、（二）、...
+
+        # 二级标题:(一)、(二)、...
         self.re_heading_2 = re.compile(
-            r'^（[一二三四五六七八九十]+）'
+            r'^([一二三四五六七八九十]+)'
         )
-        
-        # 三级标题：1.1、1.1.1（纯数字点号）
+
+        # 三级标题:1.1、1.1.1(纯数字点号)
         self.re_heading_3 = re.compile(r'^\d+\.\d+(?:\.\d+)?$')
 
-        # 一级标题：第X章　XXX（章节格式）
+        # 一级标题:第X章 XXX(章节格式)
         self.re_heading_1_chapter = re.compile(
-            r'^第[一二三四五六七八九十]+章[\u3000\s　]+'
+            r'^第[一二三四五六七八九十]+章[\u3000\s ]+'
         )
 
-        # 二级标题：第X条（...）格式
+        # 二级标题:第X条(...)格式
         self.re_heading_2_article = re.compile(
-            r'^第[一二三四五六七八九十]+条（.+）'
+            r'^第[一二三四五六七八九十]+条(.+)'
         )
 
-        # 签发人：签发人：xxx
-        self.re_issuer = re.compile(r'^签发人：.+')
+        # 签发人:签发人:xxx
+        self.re_issuer = re.compile(r'^签发人:.+')
 
-        # 发文号：xxx〔2024〕xxx号
+        # 发文号:xxx〔2024〕xxx号
         self.re_document_number = re.compile(r'^.*〔\d{4}〕.*号$')
 
-        # 附件说明：附件：或附件1：
-        self.re_attachment = re.compile(r'^附件[：:\s]')
+        # 附件说明:附件:或附件1:
+        self.re_attachment = re.compile(r'^附件[::\s]')
 
-        # 抄送单位：抄送：xxx
-        self.re_cc_unit = re.compile(r'^抄送：.+')
+        # 抄送单位:抄送:xxx
+        self.re_cc_unit = re.compile(r'^抄送:.+')
 
-        # 印发机关和日期：xxx 2024年1月1日印发
+        # 印发机关和日期:xxx 2024年1月1日印发
         self.re_publisher = re.compile(r'^\S+\s+\d{4}年\d{1,2}月\d{1,3}日印发$')
 
-        # 主题词：主题词：xxx
-        self.re_theme_keyword = re.compile(r'^主题词：.+')
-        
-        # 日期行：支持中文数字（〇二十○六）或阿拉伯数字（2026）
-        # 格式：年(4位数字或2-4个中文)月日
+        # 主题词:主题词:xxx
+        self.re_theme_keyword = re.compile(r'^主题词:.+')
+
+        # 日期行:支持中文数字(〇二十○六)或阿拉伯数字(2026)
+        # 格式:年(4位数字或2-4个中文)月日
         self.re_date_line = re.compile(
-            r'^(?:\d{4}|[一二三四五六七八九〇]{2,4})年[\d一二三四五六七八九十]{1,2}月[\d一二三四五六七八九十]{1,3}日$'
+            r'^(?:\d{4}|[一二三四五六七八九〇]{2,4})年[\d一二三四五六七八九十]{1,2}月[\d一二三四五六七八九十]{1,2}日$'
         )
-        
+
         # 结语关键词
         self.re_conclusion = re.compile(
             r'^(妥否|请批示|请审阅|请审核|以上如无不妥)'
         )
-        
-        # 主标题特征：前两段、简短、含"关于"
+
+        # 主标题特征:前两段、简短、含"关于"
         self.re_main_title = re.compile(
             r'^关于'
         )
-        
+
         logger.debug("[Classifier] 正则表达式已编译")
-    
+
     def process(self, blocks: List[DocumentIRBlock]) -> List[DocumentIRBlock]:
         """
-        处理 IR Block 序列，原地更新 label 字段
-        
+        处理 IR Block 序列,原地更新 label 字段
+
         Args:
             blocks: IR Block 序列
-            
+
         Returns:
             更新后的 IR Block 序列
         """
         if not blocks:
             return blocks
-        
+
         total_blocks = len(blocks)
-        
-        logger.info(f"[Classifier] 开始分类，共 {total_blocks} 个 Block")
-        
+
+        logger.info(f"[Classifier] 开始分类,共 {total_blocks} 个 Block")
+
         try:
             for block in blocks:
                 self._classify_block(block, total_blocks)
-            
+
             # 统计结果
             stats = self._count_labels(blocks)
             logger.info(f"[Classifier] 分类完成: {stats}")
-            
+
         except Exception as e:
             raise ClassificationError(f"分类失败: {e}") from e
-        
+
         return blocks
-    
+
     def _classify_block(self, block: DocumentIRBlock, total_blocks: int) -> None:
         """
         分类单个 Block
-        
+
         Args:
             block: IR Block
-            total_blocks: 总段落数（用于计算位置）
+            total_blocks: 总段落数(用于计算位置)
         """
         text = block.text.strip()
-        
+
         if not text:
             block.label = BlockLabel.UNKNOWN
             block.classifier_source = "FALLBACK"
             block.confidence = 0.0
             return
-        
+
         position_ratio = block.source_para_idx / max(total_blocks - 1, 1)
-        
-        # ========== L1: 规则判断（最高优先级）==========
+
+        # ========== L1: 规则判断(最高优先级)==========
 
         # 称谓行
         if self._is_salutation(text):
@@ -175,7 +175,7 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 称谓行: {text[:20]}")
             return
 
-        # 一级标题（第X章）
+        # 一级标题(第X章)
         if self.re_heading_1_chapter.match(text):
             block.label = BlockLabel.TITLE_L1
             block.classifier_source = "RULE"
@@ -183,7 +183,7 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 一级标题(章): {text[:20]}")
             return
 
-        # 一级标题：一、二、三、...
+        # 一级标题:一、二、三、...
         if self._is_heading_1(text):
             block.label = BlockLabel.TITLE_L1
             block.classifier_source = "RULE"
@@ -191,7 +191,7 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 一级标题: {text[:20]}")
             return
 
-        # 二级标题（第X条）
+        # 二级标题(第X条)
         if self.re_heading_2_article.match(text):
             block.label = BlockLabel.TITLE_L2
             block.classifier_source = "RULE"
@@ -199,14 +199,14 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 二级标题(条): {text[:20]}")
             return
 
-        # 二级标题：（一）、（二）、...
+        # 二级标题:(一)、(二)、...
         if self._is_heading_2(text):
             block.label = BlockLabel.TITLE_L2
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 二级标题: {text[:20]}")
             return
-        
+
         # 签发人
         if self._is_issuer(text):
             block.label = BlockLabel.SIGNATURE
@@ -255,14 +255,14 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 主题词: {text}")
             return
 
-        # 日期行 → 成文日期（严格右空四字）
+        # 日期行 → 成文日期(严格右空四字)
         if self._is_date_line(text):
             block.label = BlockLabel.SIGNATURE_DATE  # 成文日期
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 成文日期: {text}")
             return
-        
+
         # 结语
         if self._is_conclusion(text):
             block.label = BlockLabel.CONCLUSION
@@ -270,10 +270,10 @@ class RuleSpatialClassifier:
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 结语: {text[:20]}")
             return
-        
+
         # ========== L3: 空间位置辅助 ==========
-        
-        # 标题区（前10%）
+
+        # 标题区(前10%)
         if position_ratio <= self.config.title_zone_ratio:
             if len(text) < self.config.very_short_threshold:
                 block.label = BlockLabel.MAIN_TITLE
@@ -281,12 +281,12 @@ class RuleSpatialClassifier:
                 block.confidence = self.config.spatial_confidence
                 logger.debug(f"[L3] 主标题(位置): {text[:20]}")
             else:
-                # 短文本但不在标题区，可能是正文标题
+                # 短文本但不在标题区,可能是正文标题
                 block.label = BlockLabel.TEXT_BODY
                 block.classifier_source = "SPATIAL"
                 block.confidence = self.config.spatial_confidence
             return
-        
+
         # 落款区（后15%）→ 发文机关署名
         if position_ratio >= self.config.signature_zone_ratio:
             if self._is_signature(text):
@@ -295,31 +295,38 @@ class RuleSpatialClassifier:
                 block.confidence = self.config.spatial_confidence
                 logger.debug(f"[L3] 发文署名(位置): {text[:20]}")
                 return
-        
+            elif self._is_date_line(text):  # 落款区也检查日期行
+                block.label = BlockLabel.SIGNATURE_DATE
+                block.classifier_source = "SPATIAL"
+                block.confidence = self.config.spatial_confidence
+                logger.debug(f"[L3] 落款日期(位置): {text[:20]}")
+                return
+            # else: 落入 Fallback
+
         # ========== Fallback: 正文 ==========
-        
+
         block.label = BlockLabel.TEXT_BODY
         block.classifier_source = "FALLBACK"
         block.confidence = self.config.fallback_confidence
-    
+
     def _is_heading_1(self, text: str) -> bool:
-        """判断是否一级标题：一、二、三、..."""
+        """判断是否一级标题:一、二、三、..."""
         return (
             self.re_heading_1.match(text) is not None
             and len(text) < self.config.short_text_threshold
         )
-    
+
     def _is_heading_2(self, text: str) -> bool:
-        """判断是否二级标题：（一）、（二）..."""
+        """判断是否二级标题:(一)、(二)..."""
         return (
             self.re_heading_2.match(text) is not None
             and len(text) < self.config.short_text_threshold + 10
         )
-    
+
     def _is_date_line(self, text: str) -> bool:
         """判断是否日期行"""
         return self.re_date_line.match(text) is not None
-    
+
     def _is_conclusion(self, text: str) -> bool:
         """判断是否结语"""
         return self.re_conclusion.search(text) is not None
@@ -347,12 +354,12 @@ class RuleSpatialClassifier:
     def _is_theme_keyword(self, text: str) -> bool:
         """判断是否主题词"""
         return self.re_theme_keyword.match(text) is not None
-    
-    # 第X条正则（用于排除）
+
+    # 第X条正则(用于排除)
     re_article_exclude = re.compile(r'^第[一二三四五六七八九十]+条')
-    
+
     def _is_salutation(self, text: str) -> bool:
-        """判断是否称谓行（排除发文号、第X条等干扰项）"""
+        """判断是否称谓行(排除发文号、第X条等干扰项)"""
         # 排除含有〔年份〕的干扰项
         if '〔' in text and '〕' in text:
             return False
@@ -361,19 +368,19 @@ class RuleSpatialClassifier:
             return False
         return (
             text.startswith('尊敬的')
-            or ('：' in text and len(text) < 30)
-            or text.endswith('：')
+            or (':' in text and len(text) < 30)
+            or text.endswith(':')
         )
-    
+
     def _is_signature(self, text: str) -> bool:
         """判断是否落款"""
         # 包含机构名称关键词或日期
-        signature_keywords = ['局', '办公室', '委员会', '中心', '厅', '部', '办公室']
+        signature_keywords = ['局', '办公室', '委员会', '中心', '厅', '部']
         return (
             any(kw in text for kw in signature_keywords)
             or self.re_date_line.search(text) is not None
         )
-    
+
     def _count_labels(self, blocks: List[DocumentIRBlock]) -> dict:
         """统计各标签数量"""
         counts = {}
@@ -387,10 +394,10 @@ class RuleSpatialClassifier:
 def classify_blocks(blocks: List[DocumentIRBlock]) -> List[DocumentIRBlock]:
     """
     一行代码分类 IR Block 序列
-    
+
     Args:
         blocks: IR Block 序列
-        
+
     Returns:
         分类后的序列
     """
