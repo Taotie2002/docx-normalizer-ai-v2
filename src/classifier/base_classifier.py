@@ -68,19 +68,26 @@ class RuleSpatialClassifier:
             r'^（[一二三四五六七八九十]+）'
         )
         
-        # 三级标题：1.1、1.1.1（纯数字点号）或 (1)、（1）（括号数字）
-        self.re_heading_3 = re.compile(
-            r'^(?:\d+\.\d+(?:\.\d+)?|\(?\d+\)?)$'
-        )
+        # 三级标题：1.1、1.1.1（纯数字点号）
+        self.re_heading_3 = re.compile(r'^\d+\.\d+(?:\.\d+)?$')
 
         # 签发人：签发人：xxx
-        self.re_issuer = re.compile(r'^签发人：')
+        self.re_issuer = re.compile(r'^签发人：.+')
 
         # 发文号：xxx〔2024〕xxx号
         self.re_document_number = re.compile(r'^.*〔\d{4}〕.*号$')
 
         # 附件说明：附件：或附件1：
         self.re_attachment = re.compile(r'^附件[：:\s]')
+
+        # 抄送单位：抄送：xxx
+        self.re_cc_unit = re.compile(r'^抄送：.+')
+
+        # 印发机关和日期：xxx 2024年1月1日印发
+        self.re_publisher = re.compile(r'^\S+\s+\d{4}年\d{1,2}月\d{1,3}日印发$')
+
+        # 主题词：主题词：xxx
+        self.re_theme_keyword = re.compile(r'^主题词：.+')
         
         # 日期行：XXXX年XX月XX日
         self.re_date_line = re.compile(
@@ -175,7 +182,7 @@ class RuleSpatialClassifier:
 
         # 发文号
         if self._is_document_number(text):
-            block.label = BlockLabel.SIGNATURE
+            block.label = BlockLabel.TEXT_BODY
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 发文号: {text}")
@@ -187,6 +194,30 @@ class RuleSpatialClassifier:
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
             logger.debug(f"[L1] 附件说明: {text}")
+            return
+
+        # 抄送单位
+        if self._is_cc_unit(text):
+            block.label = BlockLabel.CC_UNIT
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 抄送单位: {text}")
+            return
+
+        # 印发机关和日期
+        if self._is_publisher(text):
+            block.label = BlockLabel.PUBLISHER_INFO
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 印发机关和日期: {text}")
+            return
+
+        # 主题词
+        if self._is_theme_keyword(text):
+            block.label = BlockLabel.THEME_KEYWORD
+            block.classifier_source = "RULE"
+            block.confidence = self.config.rule_confidence
+            logger.debug(f"[L1] 主题词: {text}")
             return
 
         # 日期行
@@ -273,6 +304,18 @@ class RuleSpatialClassifier:
     def _is_attachment(self, text: str) -> bool:
         """判断是否附件说明"""
         return self.re_attachment.match(text) is not None
+
+    def _is_cc_unit(self, text: str) -> bool:
+        """判断是否抄送单位"""
+        return self.re_cc_unit.match(text) is not None
+
+    def _is_publisher(self, text: str) -> bool:
+        """判断是否印发机关和日期"""
+        return self.re_publisher.match(text) is not None
+
+    def _is_theme_keyword(self, text: str) -> bool:
+        """判断是否主题词"""
+        return self.re_theme_keyword.match(text) is not None
     
     def _is_salutation(self, text: str) -> bool:
         """判断是否称谓行"""

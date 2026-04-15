@@ -135,6 +135,9 @@ class BlockLabel:
     SIGNATURE = "SIGNATURE"             # 落款
     ATTACHMENT = "ATTACHMENT"           # 附件说明
     LIST_ITEM = "LIST_ITEM"             # 列表项
+    CC_UNIT = "CC_UNIT"                 # 抄送单位
+    PUBLISHER_INFO = "PUBLISHER_INFO"   # 印发机关和日期
+    THEME_KEYWORD = "THEME_KEYWORD"     # 主题词
     
     # 复杂对象
     TABLE = "TABLE"                     # 表格
@@ -150,8 +153,8 @@ class BlockLabel:
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
             cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
-            cls.ATTACHMENT, cls.LIST_ITEM, cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK,
-            cls.UNKNOWN
+            cls.ATTACHMENT, cls.LIST_ITEM, cls.CC_UNIT, cls.PUBLISHER_INFO, cls.THEME_KEYWORD,
+            cls.TABLE, cls.INLINE_PICTURE, cls.PAGE_BREAK, cls.UNKNOWN
         )
     
     @classmethod
@@ -160,5 +163,6 @@ class BlockLabel:
         return label in (
             cls.UNPROCESSED, cls.MAIN_TITLE, cls.TITLE_L1, cls.TITLE_L2, cls.TITLE_L3,
             cls.SALUTATION, cls.TEXT_BODY, cls.CONCLUSION, cls.SIGNATURE,
-            cls.ATTACHMENT, cls.LIST_ITEM, cls.UNKNOWN
+            cls.ATTACHMENT, cls.LIST_ITEM, cls.CC_UNIT, cls.PUBLISHER_INFO, cls.THEME_KEYWORD,
+            cls.UNKNOWN
         )
