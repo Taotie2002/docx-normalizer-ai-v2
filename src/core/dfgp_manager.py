@@ -74,10 +74,18 @@ class DFGPManager:
     """
     文档格式基因图谱 (DFGP) 管理器
     
+    设计原则：配置与计算分离
+    - DFGP 配置是声明式的（声明"右空几字"、"首行缩进几字符"）
+    - 计算能力由管理器提供（动态换算为 Twips）
+    - 即使临时修改正文字号，缩进也会自动随之缩放
+    
+    对外暴露的计算能力：
+    - calculate_right_indent(chars, font_size_pt): 动态计算右侧缩进
+    - calculate_first_line_indent(chars, font_size_pt): 动态计算首行缩进
+    
     GB/T 9704-2012 公文格式标准预设配置：
     - 主标题：方正小标宋简体 22pt 居中
     - 一级标题：黑体 16pt
-    - 二级标题：楷体_GB2312 16pt
     - 二级标题：楷体_GB2312 16pt
     - 正文：仿宋_GB2312 16pt 首行缩进32pt
     - 落款：仿宋_GB2312 16pt 右空两字
@@ -264,6 +272,30 @@ class DFGPManager:
             page_break_before=base.get('page_break_before', False),
             outline_level=base.get('outline_level')
         )
+    
+    def calculate_right_indent(self, chars: int, font_size_pt: float) -> int:
+        """
+        动态计算右侧缩进（"右空X字"）
+        
+        这是对外暴露的计算能力，使得 DFGP 配置可以保持声明式（chars），
+        而计算结果由管理器在运行时动态生成。
+        
+        计算公式: Twips = 字符数 × 字号(pt) × 20
+        
+        Args:
+            chars: 字符数（如 2 表示"右空两字"）
+            font_size_pt: 当前字号（磅值）
+            
+        Returns:
+            int: Twips 值
+            
+        Example:
+            calculate_right_indent(chars=4, font_size_pt=22)  # 主标题22pt右空4字
+            # 返回: 4 × 22 × 20 = 1760 Twips
+        """
+        if chars < 0 or font_size_pt < 0:
+            raise ValueError(f"字符数和字号不能为负: chars={chars}, font_size_pt={font_size_pt}")
+        return int(chars * font_size_pt * 20)
     
     def _pt_to_twips(self, pt: float) -> int:
         """磅值转 Twips (1pt = 20 Twips)"""
