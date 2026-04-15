@@ -1,11 +1,11 @@
 {
   "version": "1.0",
-  "description": "批量处理状态机控制文件",
+  "description": "批量处理状态机控制文件 - Golden Set 验收",
   "state_machine": {
     "states": [
       "PENDING",
       "EXTRACTING",
-      "CLASSIFYING", 
+      "CLASSIFYING",
       "COMPILING",
       "VALIDATING",
       "AUDITING",
@@ -16,7 +16,7 @@
     "initial_state": "PENDING",
     "transitions": {
       "PENDING": ["EXTRACTING"],
-      "EXTRACTING": ["CLASSIFYING", "FAILED"],
+      "EXTRACTING": ["COMPILING", "FAILED"],
       "CLASSIFYING": ["COMPILING", "FAILED"],
       "COMPILING": ["VALIDATING", "FAILED"],
       "VALIDATING": ["AUDITING", "FAILED"],
@@ -27,6 +27,38 @@
   "retry_policy": {
     "max_retries_per_block": 3,
     "circuit_breaker_threshold": 3
+  },
+  "golden_set": {
+    "description": "Golden Set 验收测试配置",
+    "types": {
+      "A": {
+        "name": "纯文字长文档",
+        "count": 15,
+        "target": "tests/golden_set/type_a_pure_text/"
+      },
+      "B": {
+        "name": "嵌套列表",
+        "count": 15,
+        "target": "tests/golden_set/type_b_nested_lists/"
+      },
+      "C": {
+        "name": "表格+内联图片",
+        "count": 10,
+        "target": "tests/golden_set/type_c_tables_images/"
+      },
+      "D": {
+        "name": "极致乱码风",
+        "count": 10,
+        "target": "tests/golden_set/type_d_messy_format/"
+      }
+    },
+    "total_samples": 50,
+    "pass_criteria": {
+      "type_a": "V-03 ALL_PASS",
+      "type_b": "列表层级识别率 >= 90%",
+      "type_c": "复杂对象锚点完整",
+      "type_d": "V-03 Hash 比对通过"
+    }
   },
   "jobs": []
 }
