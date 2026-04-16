@@ -158,19 +158,19 @@ class SemanticCompiler:
         rFonts.set(qn('w:ascii'), font_family)
         rFonts.set(qn('w:hAnsi'), font_family)
         
-        # 设置字号
+        # 设置字号 (w:sz 使用半磅单位，1pt=2半磅)
         sz = rPr.find(qn('w:sz'))
         if sz is None:
             sz = OxmlElement('w:sz')
             rPr.append(sz)
-        sz.set(qn('w:val'), str(params.font_size_twips))
+        sz.set(qn('w:val'), str(int(params.font_size_pt * 2)))
         
         # 设置 szCs（复杂文种字号）
         szCs = rPr.find(qn('w:szCs'))
         if szCs is None:
             szCs = OxmlElement('w:szCs')
             rPr.append(szCs)
-        szCs.set(qn('w:val'), str(params.font_size_twips))
+        szCs.set(qn('w:val'), str(int(params.font_size_pt * 2)))
     
     def _set_paragraph_xml(self, paragraph, params: StyleParams) -> None:
         """

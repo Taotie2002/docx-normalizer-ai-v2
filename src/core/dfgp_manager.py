@@ -41,6 +41,7 @@ class PageMargin:
 class StyleParams:
     """样式参数（Twips 单位）"""
     font_family: str
+    font_size_pt: int  # 磅值（用于计算 w:sz 半磅）
     font_size_twips: int
     alignment: str  # LEFT, CENTER, RIGHT, JUSTIFY
     
@@ -59,6 +60,7 @@ class StyleParams:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "font_family": self.font_family,
+            "font_size_pt": self.font_size_pt,
             "font_size_twips": self.font_size_twips,
             "alignment": self.alignment,
             "first_line_indent_twips": self.first_line_indent_twips,
@@ -268,6 +270,7 @@ class DFGPManager:
         
         return StyleParams(
             font_family=font_family,
+            font_size_pt=font_size_pt,
             font_size_twips=font_size_twips,
             alignment=alignment,
             first_line_indent_twips=first_line_indent_twips,

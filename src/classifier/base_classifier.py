@@ -368,8 +368,8 @@ class RuleSpatialClassifier:
             return False
         return (
             text.startswith('尊敬的')
-            or (':' in text and len(text) < 30)
-            or text.endswith(':')
+            or ('：' in text and len(text) < 30)
+            or text.endswith('：')
         )
 
     def _is_signature(self, text: str) -> bool:
