@@ -24,6 +24,8 @@ import logging
 from src.core.ir_block import DocumentIRBlock
 from src.core.dfgp_manager import DFGPManager, StyleParams
 from src.core.exceptions import CompilationError
+from src.extractor.toc_detector import TocInfo
+from src.compiler.toc_generator import TocGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +72,8 @@ class SemanticCompiler:
     def build_from_ir(
         self, 
         ir_blocks: List[DocumentIRBlock], 
-        output_path: str
+        output_path: str,
+        toc_info: TocInfo = None
     ) -> None:
         """
         主循环：将 IR Block 序列重构为物理文档
@@ -78,6 +81,7 @@ class SemanticCompiler:
         Args:
             ir_blocks: IR Block 序列
             output_path: 输出文件路径
+            toc_info: 目录元数据（如有）
             
         Raises:
             CompilationError: 重构失败
@@ -88,14 +92,38 @@ class SemanticCompiler:
         logger.info(f"[SemanticCompiler] 开始重构，共 {len(ir_blocks)} 个 Block")
         
         try:
+            # 查找目录插入位置（如果有目录的话）
+            toc_insert_idx = -1
+            if toc_info and toc_info.has_toc:
+                # 在主送机关行之后插入目录
+                for i, block in enumerate(ir_blocks):
+                    if block.label == 'SALUTATION':
+                        toc_insert_idx = i + 1
+                        break
+            
             for i, block in enumerate(ir_blocks):
                 self._process_block(block)
+                
+                # 在指定位置插入目录
+                if i == toc_insert_idx and toc_info and toc_info.has_toc:
+                    self._insert_toc(toc_info)
             
             self.doc.save(output_path)
             logger.info(f"[SemanticCompiler] 重构完成: {output_path}")
             
         except Exception as e:
             raise CompilationError(f"重构失败: {e}") from e
+    
+    def _insert_toc(self, toc_info: TocInfo) -> None:
+        """
+        插入目录（带分节符）
+        
+        Args:
+            toc_info: 目录元数据
+        """
+        toc_gen = TocGenerator()
+        toc_gen.insert_toc(self.doc, toc_info, insert_idx=0)
+        logger.info("[SemanticCompiler] 目录已插入")
     
     def _process_block(self, block: DocumentIRBlock) -> None:
         """

@@ -14,6 +14,7 @@ import logging
 
 from src.core.ir_block import DocumentIRBlock, BlockLabel
 from src.core.exceptions import ExtractionError
+from src.extractor.toc_detector import TocDetector, TocInfo
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class DocxExtractor:
         self.file_path = file_path
         self._doc: Optional[Document] = None
         self._total_paragraphs: int = 0
+        self.toc_info: TocInfo = TocInfo()  # 目录元数据
     
     @property
     def doc(self) -> Document:
@@ -48,7 +50,7 @@ class DocxExtractor:
             self._total_paragraphs = len(self._doc.paragraphs)
         return self._doc
     
-    def extract_to_ir(self) -> List[DocumentIRBlock]:
+    def extract_to_ir(self, skip_toc: bool = True) -> List[DocumentIRBlock]:
         """
         将文档彻底脱骨，压扁为 IR Block 序列
         
@@ -57,6 +59,9 @@ class DocxExtractor:
         - label 默认为 UNPROCESSED，后续由 Classifier 填充
         - 空段落可选保留（用于保持文档结构）
         
+        Args:
+            skip_toc: 是否跳过目录（默认True）
+            
         Returns:
             List[DocumentIRBlock]: IR Block 序列
             
@@ -92,6 +97,17 @@ class DocxExtractor:
             
             # V-03 验证：检查 source_para_idx 是否严格递增
             self._validate_sequence(ir_blocks)
+            
+            # 目录检测
+            toc_detector = TocDetector()
+            self.toc_info = toc_detector.detect(ir_blocks)
+            
+            # 跳过目录（如需要）
+            if skip_toc and self.toc_info.has_toc:
+                before_toc = ir_blocks[:self.toc_info.start_idx]
+                after_toc = ir_blocks[self.toc_info.end_idx + 1:]
+                ir_blocks = before_toc + after_toc
+                logger.info(f"[Extractor] 跳过目录 idx={self.toc_info.start_idx}-{self.toc_info.end_idx}")
             
             return ir_blocks
             
