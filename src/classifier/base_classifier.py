@@ -411,13 +411,29 @@ class RuleSpatialClassifier:
         return True
 
     def _is_signature(self, text: str) -> bool:
-        """判断是否落款"""
-        # 包含机构名称关键词或日期
-        signature_keywords = ['局', '办公室', '委员会', '中心', '厅', '部']
-        return (
-            any(kw in text for kw in signature_keywords)
-            or self.re_date_line.search(text) is not None
-        )
+        """
+        判断是否落款单位/署名
+        - 必须简短（落款通常是单行）
+        - 必须包含单位/部门名称或姓名
+        - 不能是正文段落（正文通常较长）
+        """
+        # 排除正文段落（正文通常较长）
+        if len(text) > 50:
+            return False
+        
+        # 单位关键词（落款中的单位通常是独立的词条）
+        unit_keywords = ['人民政府', '办公室', '委员会', '局', '厅', '部', '处', '局', '公司', '医院', '学校', '大学', '中心']
+        has_unit = any(uk in text for uk in unit_keywords)
+        
+        # 排除含有句号、分号等正文标点的（正文常用）
+        body_punct = ['。', '；', '，']
+        has_body_punct = any(p in text for p in body_punct)
+        
+        # 落款可以是纯单位名（无标点）或含冒号的称谓
+        if has_body_punct:
+            return False
+        
+        return has_unit or len(text) <= 20
 
     def _count_labels(self, blocks: List[DocumentIRBlock]) -> dict:
         """统计各标签数量"""
