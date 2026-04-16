@@ -84,8 +84,8 @@ class RuleSpatialClassifier:
         # 签发人:签发人:xxx
         self.re_issuer = re.compile(r'^签发人：.+')
 
-        # 发文号:xxx〔2024〕xxx号
-        self.re_document_number = re.compile(r'^.*〔\d{4}〕.*号$')
+        # 文号:汉字+〔年份〕+序号+号
+        self.re_document_number = re.compile(r'^[\u4e00-\u9fa5]+〔\d{4}〕\d{1,4}号$')
 
         # 附件说明:附件:或附件1:
         self.re_attachment = re.compile(r'^附件[::\s]')
@@ -215,12 +215,12 @@ class RuleSpatialClassifier:
             logger.debug(f"[L1] 签发人: {text}")
             return
 
-        # 发文号
+        # 文号
         if self._is_document_number(text):
-            block.label = BlockLabel.TEXT_BODY
+            block.label = BlockLabel.DOC_NUMBER
             block.classifier_source = "RULE"
             block.confidence = self.config.rule_confidence
-            logger.debug(f"[L1] 发文号: {text}")
+            logger.debug(f"[L1] 文号: {text}")
             return
 
         # 附件说明

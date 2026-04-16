@@ -153,6 +153,13 @@ class DFGPManager:
             "alignment": "RIGHT",
             "right_indent_chars": 4  # 成文日期严格右空四字
         },
+        # 文号（合政办〔2017〕1号）：居中、仿宋、无缩进
+        "DOC_NUMBER": {
+            "font_family": "仿宋_GB2312",
+            "font_size_pt": 16,
+            "alignment": "CENTER",
+            "first_line_indent_chars": 0
+        },
         "LIST_ITEM": {
             "font_family": "仿宋_GB2312",
             "font_size_pt": 16,
@@ -200,7 +207,7 @@ class DFGPManager:
     
     def _validate_config(self) -> None:
         """验证配置完整性"""
-        required_labels = ['MAIN_TITLE', 'TITLE_L1', 'TITLE_L2', 'TEXT_BODY', 'SIGNATURE_NAME', 'SIGNATURE_DATE']
+        required_labels = ['MAIN_TITLE', 'TITLE_L1', 'TITLE_L2', 'TEXT_BODY', 'SIGNATURE_NAME', 'SIGNATURE_DATE', 'DOC_NUMBER']
         for label in required_labels:
             if label not in self.config:
                 logger.warning(f"缺少标签 {label}，将使用默认配置")

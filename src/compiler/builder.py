@@ -84,6 +84,9 @@ class DocxCompiler:
         if not text:
             return
         
+        # 规则1：首行缩进前去除前导空格（中文全角空格和ASCII空格）
+        text = text.lstrip('\u3000 ')
+        
         # Phase 1 策略：根据 heading_level 选择添加方式
         if block.heading_level is not None and block.heading_level > 0:
             # 标题段落

@@ -136,6 +136,7 @@ class BlockLabel:
     SIGNATURE_NAME = "SIGNATURE_NAME"     # 发文机关署名（居右对齐）
     SIGNATURE_DATE = "SIGNATURE_DATE"       # 成文日期（严格右空四字）
     ATTACHMENT = "ATTACHMENT"           # 附件说明
+    DOC_NUMBER = "DOC_NUMBER"           # 文号（合政办〔2017〕1号）
     LIST_ITEM = "LIST_ITEM"             # 列表项
     CC_UNIT = "CC_UNIT"                 # 抄送单位
     PUBLISHER_INFO = "PUBLISHER_INFO"   # 印发机关和日期

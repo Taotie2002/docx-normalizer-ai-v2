@@ -154,9 +154,10 @@ class SemanticCompiler:
         # 设置中文字体
         rFonts.set(qn('w:eastAsia'), font_family)
         
-        # 同时设置 ASCII 和 HAnsi（兼容西文部分）
-        rFonts.set(qn('w:ascii'), font_family)
-        rFonts.set(qn('w:hAnsi'), font_family)
+        # 规则4：字母和数字使用Times New Roman
+        rFonts.set(qn('w:ascii'), 'Times New Roman')
+        rFonts.set(qn('w:hAnsi'), 'Times New Roman')
+        rFonts.set(qn('w:hint'), 'eastAsia')  # 提示引擎优先使用东亚字体
         
         # 设置字号 (w:sz 使用半磅单位，1pt=2半磅)
         sz = rPr.find(qn('w:sz'))
