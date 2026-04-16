@@ -359,18 +359,50 @@ class RuleSpatialClassifier:
     re_article_exclude = re.compile(r'^第[一二三四五六七八九十]+条')
 
     def _is_salutation(self, text: str) -> bool:
-        """判断是否称谓行(排除发文号、第X条等干扰项)"""
-        # 排除含有〔年份〕的干扰项
+        """
+        判断是否主送机关行
+        - 必须以冒号结尾
+        - 必须包含职务（市长、局长等）、姓名或单位名称
+        - 只能包含顿号"、"和逗号"，"作为标点
+        """
+        # 必须以冒号结尾
+        if not text.endswith('：'):
+            return False
+        
+        # 排除含有〔年份〕的干扰项（文号）
         if '〔' in text and '〕' in text:
             return False
+        
         # 排除"第X条"格式
         if self.re_article_exclude.match(text):
             return False
-        return (
-            text.startswith('尊敬的')
-            or ('：' in text and len(text) < 30)
-            or text.endswith('：')
-        )
+        
+        # 检查是否只含允许的标点（仅顿号、逗号、括号、冒号）
+        import re
+        # 允许：顿号"、"、逗号"，"、括号"（）"、冒号"："
+        allowed_punct = '、，（）、：'
+        text_check = text
+        for p in allowed_punct:
+            text_check = text_check.replace(p, '')
+        # 如果还剩其他标点符号（如引号、书名号等），返回False
+        if re.search(r'[^\u4e00-\u9fa5\s\d]', text_check):
+            return False
+        
+        # 必须包含职务、姓名或单位名称关键词
+        job_titles = ['市长', '局长', '主任', '书记', '部长', '省长', '厅长', '处长', 
+                      '主席', '行长', '校长', '院长', '社长', '总编辑']
+        unit_keywords = ['政府', '办公室', '委员会', '厅', '局', '部', '处', '科',
+                        '公司', '医院', '学校', '大学', '中心', '协会', '基金会']
+        
+        has_job = any(jt in text for jt in job_titles)
+        has_unit = any(uk in text for uk in unit_keywords)
+        # 姓名判断：2-4个汉字连续（可能是人名）
+        has_name = bool(re.search(r'[\u4e00-\u9fa5]{2,4}', text))
+        
+        if not (has_job or has_unit or has_name):
+            return False
+        
+        return True
 
     def _is_signature(self, text: str) -> bool:
         """判断是否落款"""

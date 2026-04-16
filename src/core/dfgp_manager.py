@@ -104,20 +104,23 @@ class DFGPManager:
         },
         "TITLE_L1": {
             "font_family": "黑体",
-            "font_size_pt": 16,  # 三号
+            "font_size_pt": 16,
             "alignment": "LEFT",
+            "first_line_indent_chars": 2,
             "outline_level": 1
         },
         "TITLE_L2": {
             "font_family": "楷体_GB2312",
             "font_size_pt": 16,
             "alignment": "LEFT",
+            "first_line_indent_chars": 2,
             "outline_level": 2
         },
         "TITLE_L3": {
             "font_family": "楷体_GB2312",
             "font_size_pt": 16,
             "alignment": "LEFT",
+            "first_line_indent_chars": 2,
             "outline_level": 3
         },
         "SALUTATION": {
@@ -170,7 +173,8 @@ class DFGPManager:
         "UNKNOWN": {
             "font_family": "仿宋_GB2312",
             "font_size_pt": 16,
-            "alignment": "LEFT"
+            "alignment": "LEFT",
+            "first_line_indent_chars": 2  # 兜底也首行缩进两字
         }
     }
     
