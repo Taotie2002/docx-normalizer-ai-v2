@@ -75,6 +75,9 @@ class DocxExtractor:
             for idx, para in enumerate(self.doc.paragraphs):
                 raw_text = para.text
                 
+                # 去除前导空格（中文全角空格和ASCII空格）
+                raw_text = raw_text.lstrip('\u3000 ')
+                
                 # Phase 1: 跳过纯空段落（仅空白字符）
                 if not raw_text.strip():
                     skipped_empty += 1

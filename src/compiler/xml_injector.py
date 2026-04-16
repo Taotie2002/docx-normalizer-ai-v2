@@ -131,7 +131,7 @@ class SemanticCompiler:
         
         步骤：
         1. 获取该标签的格式参数
-        2. 创建段落并写入纯文本
+        2. 创建段落并写入纯文本（去除前导空格）
         3. 注入字体、缩进、对齐等 XML 属性
         
         Args:
@@ -140,12 +140,17 @@ class SemanticCompiler:
         if not block.text:
             return
         
+        # 去除前导空格（中文全角空格和ASCII空格）
+        text = block.text.lstrip('\u3000 ')
+        if not text:
+            return
+        
         # Step 1: 获取格式参数
         params = self.dfgp.get_style_params(block.label)
         
         # Step 2: 创建段落（不使用 add_heading，保持绝对控制）
         paragraph = self.doc.add_paragraph()
-        run = paragraph.add_run(block.text)
+        run = paragraph.add_run(text)
         
         # Step 3: 设置中文字体（必须同时设置 w:rFonts/w:eastAsia）
         self._set_font_xml(run, params)

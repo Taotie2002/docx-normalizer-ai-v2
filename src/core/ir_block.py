@@ -127,6 +127,7 @@ class BlockLabel:
     UNPROCESSED = "UNPROCESSED"         # Phase 1 默认值
     MAIN_TITLE = "MAIN_TITLE"           # 主标题
     TITLE_L1 = "TITLE_L1"               # 一级标题 (一、)
+    CHAPTER = "CHAPTER"               # 章节标题（第X章）
     TITLE_L2 = "TITLE_L2"               # 二级标题 (（一）)
     TITLE_L3 = "TITLE_L3"               # 三级标题
     SALUTATION = "SALUTATION"          # 称谓行
