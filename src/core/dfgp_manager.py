@@ -96,7 +96,7 @@ WORD_STYLE_MAPPING = {
         'font_name': '黑体',
         'font_size_pt': 16,
         'alignment': 'LEFT',
-        'first_line_indent_chars': 0,
+        'first_line_indent_chars': 2,  # 首行缩进两字
         'outline_level': 1,
     },
     'CHAPTER': {
@@ -112,7 +112,7 @@ WORD_STYLE_MAPPING = {
         'font_name': '楷体_GB2312',
         'font_size_pt': 16,
         'alignment': 'LEFT',
-        'first_line_indent_chars': 0,
+        'first_line_indent_chars': 2,  # 首行缩进两字
         'outline_level': 2,
     },
     'TITLE_L3': {
@@ -120,7 +120,7 @@ WORD_STYLE_MAPPING = {
         'font_name': '楷体_GB2312',
         'font_size_pt': 16,
         'alignment': 'LEFT',
-        'first_line_indent_chars': 0,
+        'first_line_indent_chars': 2,  # 首行缩进两字
         'outline_level': 3,
     },
     'SALUTATION': {
