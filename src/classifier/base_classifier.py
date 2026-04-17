@@ -371,8 +371,8 @@ class RuleSpatialClassifier:
         - 必须包含职务(市长、局长等)、姓名或单位名称
         - 只能包含顿号"、"和逗号","作为标点
         """
-        # 必须以冒号结尾
-        if not text.endswith(':'):
+        # 必须以冒号结尾（全角或半角）
+        if not (text.endswith(':') or text.endswith('：')):
             return False
 
         # 排除含有〔年份〕的干扰项(文号)
@@ -385,8 +385,8 @@ class RuleSpatialClassifier:
 
         # 检查是否只含允许的标点(仅顿号、逗号、括号、冒号)
         import re
-        # 允许:顿号"、"、逗号","、括号"()"、冒号":"
-        allowed_punct = '、,()、:'
+        # 允许:顿号"、"、逗号","、括号"()"和"（）"、冒号":"和"："
+        allowed_punct = '、，,()、（）、:：'
         text_check = text
         for p in allowed_punct:
             text_check = text_check.replace(p, '')
