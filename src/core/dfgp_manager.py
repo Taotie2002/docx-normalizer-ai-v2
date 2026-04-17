@@ -97,7 +97,7 @@ class DFGPManager:
     DEFAULT_CONFIG = {
         "MAIN_TITLE": {
             "font_family": "方正小标宋简体",
-            "font_size_pt": 22,  # 二号
+            "font_size_pt": 16,  # 二号
             "alignment": "CENTER",
             "space_after_pt": 8,
             "outline_level": 0
@@ -112,7 +112,7 @@ class DFGPManager:
         # 章节标题（第X章）：黑体22pt居中无缩进
         "CHAPTER": {
             "font_family": "黑体",
-            "font_size_pt": 22,
+            "font_size_pt": 16,
             "alignment": "CENTER",
             "first_line_indent_chars": 0,
             "outline_level": 1
