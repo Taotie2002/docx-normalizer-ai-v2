@@ -217,8 +217,8 @@ class SemanticCompiler:
         # 检查样式是否在文档中可用
         try:
             style = self.doc.styles[word_style]
-            paragraph.style = style
-            logger.debug(f"[Style] 已应用 Word 样式: {word_style}")
+            # paragraph.style = style  # 禁用：避免蓝色主题字体
+            logger.debug(f"[Style] 已应用 Word 样式: {word_style} (仅 outlineLevel，禁用style)")
         except KeyError:
             logger.debug(f"[Style] 样式 '{word_style}' 不存在，跳过")
     
