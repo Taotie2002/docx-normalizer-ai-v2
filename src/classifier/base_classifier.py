@@ -65,7 +65,7 @@ class RuleSpatialClassifier:
 
         # 二级标题:(一)、(二)、...
         self.re_heading_2 = re.compile(
-            r'^([一二三四五六七八九十]+)'
+            r'^（[一二三四五六七八九十]+）'
         )
 
         # 三级标题:1.1、1.1.1(纯数字点号)
